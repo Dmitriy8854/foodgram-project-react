@@ -17,4 +17,3 @@ urlpatterns = [
     #path('api/auth/', include('djoser.urls.jwt')),
     #path('subscriptions/', include('djoser.urls.authtoken')),
 ]
-

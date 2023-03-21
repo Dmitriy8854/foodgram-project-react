@@ -82,7 +82,7 @@ class RecipeViewSet(ModelViewSet):
                 recipe=recipe
             ).exists():
                 return Response(
-                    {'errors': 'Данный рецепт уже есть в списке покупок'},
+                    {'errors': 'Этот рецепт уже есть в списке покупок'},
                     status=HTTP_400_BAD_REQUEST
                 )
             Basket.objects.create(
@@ -117,7 +117,7 @@ class RecipeViewSet(ModelViewSet):
                 recipe=recipe
             ).exists():
                 return Response(
-                    {'errors': 'Этот рецепт уже добавлен в Избранное'},
+                    {'errors': 'Этот рецепт уже есть в Избранном'},
                     status=HTTP_400_BAD_REQUEST
                 )
             Favorites.objects.create(

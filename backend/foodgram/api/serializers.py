@@ -152,13 +152,13 @@ class RecipeSerializer(ModelSerializer):
             if int(ingredient['amount']) < 1:
                 raise ValidationError(
                     {'ingredients': ('Количество ингредиента в рецепте '
-                                     'должно быть больше или равно 1')
+                                     'должно быть больше 0')
                      }
                 )
         if not tags:
             raise ValidationError(
                 {'tags': ('Рецепт должен быть привязан '
-                          'как минимум к одному тегу')
+                          'минимум к одному тегу')
                  }
             )
         array_of_tags = set(tags)
