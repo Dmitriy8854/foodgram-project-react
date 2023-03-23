@@ -1,13 +1,12 @@
 from base64 import b64decode
 
 from django.core.files.base import ContentFile
-from django.shortcuts import get_object_or_404
-from rest_framework.serializers import (CharField, ImageField, ModelSerializer,
-                                        SerializerMethodField, ValidationError)
+from django.forms import BooleanField
+from rest_framework.serializers import (BooleanField, CharField, ImageField,
+                                        ModelSerializer, ValidationError)
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from recipes.models import (Basket, Favorites, Ingredient, Recipe,
-                            RecipeIngredient, RecipeTag, Tag)
+from recipes.models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 from users.serializers import CustomUserSerializer
 
 
@@ -56,8 +55,8 @@ class RecipeSerializer(ModelSerializer):
         source='recipeingredient_set',
     )
     author = CustomUserSerializer(read_only=True)
-    is_favorited = SerializerMethodField()
-    is_in_shopping_cart = SerializerMethodField()
+    is_favorited = BooleanField(read_only=True)
+    is_in_shopping_cart = BooleanField(read_only=True)
     image = Base64ImageField()
 
     class Meta:
@@ -81,12 +80,14 @@ class RecipeSerializer(ModelSerializer):
         recipe = Recipe.objects.create(**validated_data)
         for tag in tags:
             RecipeTag.objects.create(tag_id=tag, recipe=recipe)
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                ingredient_id=ingredient['id'],
+
+
+        RecipeIngredient.objects.bulk_create(
+            RecipeIngredient(
                 recipe=recipe,
-                amount=ingredient['amount']
-            )
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients)
         return recipe
 
     def update(self, instance, validated_data):
@@ -99,72 +100,61 @@ class RecipeSerializer(ModelSerializer):
         )
         tags = self.initial_data.get('tags')
         RecipeTag.objects.filter(recipe=instance).delete()
-        for tag in tags:
-            RecipeTag.objects.create(tag_id=tag, recipe=instance)
+        RecipeTag.objects.bulk_create(
+            RecipeTag(
+                tag_id=tag,
+                recipe=instance,
+
+            ) for tag in tags)
+
         ingredients = self.initial_data.get('ingredients')
         RecipeIngredient.objects.filter(recipe=instance).delete()
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                ingredient_id=ingredient['id'],
+ 
+        RecipeIngredient.objects.bulk_create(
+            RecipeIngredient(
                 recipe=instance,
-                amount=ingredient['amount']
-            )
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount')
+            ) for ingredient in ingredients)
+
         instance.save()
         return instance
 
-    def get_is_favorited(self, obj):
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return Favorites.objects.filter(
-            user=request.user,
-            recipe=obj
-        ).exists()
-
-    def get_is_in_shopping_cart(self, obj):
-        request = self.context.get('request')
-        if request.user.is_anonymous:
-            return False
-        return Basket.objects.filter(
-            user=request.user,
-            recipe=obj
-        ).exists()
-    
-    def validate(self, data):
-        ingredients = self.initial_data.get('ingredients')
-        tags = self.initial_data.get('tags')
-        if not ingredients:
-            raise ValidationError(
-                {'ingredients': ('В рецепте должен быть использован '
-                                 'минимум один ингредиент')
-                 }
-            )
+    def validate(self, data): 
+        ingredients = self.initial_data.get('ingredients') 
+        tags = self.initial_data.get('tags') 
+        if not ingredients: 
+            raise ValidationError( 
+                {'ingredients': ('В рецепте должен быть использован ' 
+                                 'минимум один ингредиент') 
+                 } 
+            ) 
         array_of_ingredients = []
-        for ingredient in ingredients:
-            current_ingredient = get_object_or_404(
-                Ingredient, pk=ingredient['id']
-            )
-            if current_ingredient in array_of_ingredients:
-                raise ValidationError(
-                    detail='Ингредиенты не должны дублироваться',
-                    code=HTTP_400_BAD_REQUEST
+        for ingredient in ingredients: 
+
+            if ingredient['id'] in array_of_ingredients: 
+                raise ValidationError( 
+                    detail='Ингредиенты не должны дублироваться', 
+                    code=HTTP_400_BAD_REQUEST 
                 )
-            if int(ingredient['amount']) < 1:
-                raise ValidationError(
-                    {'ingredients': ('Количество ингредиента в рецепте '
-                                     'должно быть больше 0')
-                     }
+            array_of_ingredients.append(ingredient['id'])
+            if int(ingredient['amount']) < 1: 
+                raise ValidationError( 
+                    {'ingredients': ('Количество ингредиента в рецепте ' 
+                                     'должно быть больше 0') 
+                     } 
                 )
-        if not tags:
-            raise ValidationError(
-                {'tags': ('Рецепт должен быть привязан '
-                          'минимум к одному тегу')
-                 }
-            )
-        array_of_tags = set(tags)
-        if len(array_of_tags) != len(tags):
-            raise ValidationError(
-                detail='Теги не должны дублироваться в рецепте',
-                code=HTTP_400_BAD_REQUEST
-            )
+
+        if not tags: 
+            raise ValidationError( 
+                {'tags': ('Рецепт должен быть привязан ' 
+                          'минимум к одному тегу') 
+                 } 
+            ) 
+        array_of_tags = set(tags) 
+        if len(array_of_tags) != len(tags): 
+            raise ValidationError( 
+                detail='Теги не должны дублироваться в рецепте', 
+                code=HTTP_400_BAD_REQUEST 
+            ) 
         return data

@@ -2,11 +2,10 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404, render
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST)
-
-from api.permissions import IsAuthenticatedOrAdmin
 
 from .models import Subscriptions, User
 from .serializers import CustomUserSerializer, FollowSerializer
@@ -19,7 +18,7 @@ class CustomUserViewSet(UserViewSet):
     serializer_class = CustomUserSerializer
 
 
-    @action(detail=False, permission_classes=(IsAuthenticatedOrAdmin,))
+    @action(detail=False, permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):
         follows = User.objects.filter(following__user=request.user)
         pages = self.paginate_queryset(follows)
@@ -32,7 +31,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(methods=['post', 'delete'],
             detail=True,
-            permission_classes=(IsAuthenticatedOrAdmin,)
+            permission_classes=(IsAuthenticated,)
             )
     def subscribe(self, request, **kwargs):
         author = get_object_or_404(User, id=self.kwargs.get('id'))
