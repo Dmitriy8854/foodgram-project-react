@@ -36,56 +36,35 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    queryset = Recipe.objects.all()
+
     serializer_class = RecipeSerializer
-    permission_classes = (IsAdmin, AuthorOrReadOnly)
+    permission_classes = (AuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
     def get_queryset(self):
         user = self.request.user
+
+        if user.is_anonymous:
+            queryset = Recipe.objects.select_related(
+            'author').prefetch_related('ingredients').annotate(
+            is_favorited=Exists(Favorites.objects.filter(user=None, recipe=OuterRef('pk'))),
+            is_in_shopping_cart=Exists(ShoppingCart.objects.filter(user=None, recipe=OuterRef('pk')))
+        )
+            return queryset
+
         favorites = Favorites.objects.filter(user=user, recipe=OuterRef('pk'))
         shopping_cart = ShoppingCart.objects.filter(user=user, recipe=OuterRef('pk'))
-        queryset = Recipe.objects.annotate(
+
+        queryset = Recipe.objects.select_related(
+            'author').prefetch_related('ingredients').annotate(
             is_favorited=Exists(favorites),
             is_in_shopping_cart=Exists(shopping_cart)
         )
         return queryset
 
-
-
-
-
-
-
-#>>>recent_comments = Comment.objects.filter(
-#...    post=OuterRef('pk'),
-#...    created_at__gte=one_day_ago,
-#... )
-#>>>Post.objects.annotate(recent_comment=Exists(recent_comments))
-
-
-
-
-  #  def get_is_favorited(self, obj):
-  #      request = self.context.get('request') 
-  #      if request.user.is_anonymous:
-        #    return False
-   #     return Favorites.objects.filter(
-   #         user=request.user,
-    #        recipe=obj
-   #     ).exists()
-
-#>>>recent_comments = Comment.objects.filter(
-#...    post=OuterRef('pk'),
-#...    created_at__gte=one_day_ago,
-#... )
-#>>>Post.objects.annotate(recent_comment=Exists(recent_comments))
-
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request):
@@ -117,11 +96,7 @@ class RecipeViewSet(ModelViewSet):
             detail=True,
             permission_classes=(IsAuthenticated,)
             )
-  #  obj, created = Person.objects.get_or_create(
-  #  first_name='John',
-  #  last_name='Lennon',
-  #  defaults={'birthday': date(1940, 10, 9)},
-#)
+
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -139,14 +114,7 @@ class RecipeViewSet(ModelViewSet):
                 recipe=recipe
             )
             return Response(serializer.data, status=HTTP_201_CREATED)
-      #  if not Basket.objects.filter(
-       #     user=request.user,
-     #       recipe=recipe
-     #   ).exists():
-      #      return Response(
-      #          {'errors': 'Этот рецепт в Корзине отсутствует'},
-     #           status=HTTP_400_BAD_REQUEST
-     #       )
+
         ShoppingCart.objects.filter(
             user=request.user,
             recipe=recipe
@@ -174,14 +142,7 @@ class RecipeViewSet(ModelViewSet):
                 recipe=recipe
             )
             return Response(serializer.data, status=HTTP_201_CREATED)
-        if not Favorites.objects.filter(
-            user=request.user,
-            recipe=recipe
-        ).exists():
-            return Response(
-                {'errors': 'Этот рецепт отсутствует в Избранном'},
-                status=HTTP_400_BAD_REQUEST
-            )
+
         Favorites.objects.filter(
             user=request.user,
             recipe=recipe
