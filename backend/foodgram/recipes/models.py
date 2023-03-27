@@ -55,8 +55,8 @@ class Recipe(models.Model):
         'Наименование рецепта', max_length=200
     )
     image = models.ImageField('Картинка',
-        upload_to='recipes/images'     
-    )
+                              upload_to='recipes/images'
+                              )
     text = models.TextField(
         'Описание рецепта', max_length=200
     )

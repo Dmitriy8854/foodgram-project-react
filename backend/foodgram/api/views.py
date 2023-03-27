@@ -11,6 +11,7 @@ from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from recipes.models import (Favorites, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
+
 from .filters import RecipeFilter
 from .permissions import AuthorOrReadOnly, IsAdmin
 from .serializers import (IngredientSerializer, RecipeSerializer,
@@ -47,10 +48,12 @@ class RecipeViewSet(ModelViewSet):
             queryset = Recipe.objects.select_related(
                 'author').prefetch_related('ingredients').annotate(
                     is_favorited=Exists(
-                        Favorites.objects.filter(user=None, recipe=OuterRef('pk'))),
+                        Favorites.objects.filter(
+                user=None, recipe=OuterRef('pk'))),
                     is_in_shopping_cart=Exists(
-                        ShoppingCart.objects.filter(user=None, recipe=OuterRef('pk')))
-                )
+                        ShoppingCart.objects.filter(
+                user=None, recipe=OuterRef('pk')))
+            )
             return queryset
 
         favorites = Favorites.objects.filter(user=user, recipe=OuterRef('pk'))
