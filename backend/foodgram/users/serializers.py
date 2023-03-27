@@ -4,9 +4,6 @@ from django.forms import ValidationError
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from rest_framework.validators import UniqueTogetherValidator
-
-from recipes.models import Ingredient, Recipe, Tag
 from users.models import User
 
 from .models import Subscriptions
@@ -15,20 +12,24 @@ from .models import Subscriptions
 class RegistreUserSerializer(UserCreateSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'username', 'password')
+        fields = (
+            'id', 'email', 'first_name', 'last_name', 'username', 'password')
         write_only_field = ('password',)
 
     def validate_username(self, value):
         if not match(r'[\w.@+\-]+', value):
             raise ValidationError('Некорректный логин')
         return value
-                     
+
+
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'username', 'is_subscribed')
+        fields = (
+            'id', 'email', 'first_name', 'last_name', 'username', 'is_subscribed'
+        )
         write_only_field = ('password',)
 
     def get_is_subscribed(self, obj):
@@ -39,6 +40,7 @@ class CustomUserSerializer(UserSerializer):
             user=request.user,
             author=obj.id
         ).exists()
+
 
 class FollowSerializer(CustomUserSerializer):
     recipes = serializers.SerializerMethodField()
@@ -57,18 +59,9 @@ class FollowSerializer(CustomUserSerializer):
             'recipes_count'
         )
         read_only_fields = ('email', 'username', 'first_name', 'last_name')
-        #validators = [
-          #  UniqueTogetherValidator(
-             #   queryset=Subscriptions.objects.all(),
-              #  fields=('user', 'author'),
-              #  message=('Пользователь не может подписаться '
-              #           'на другого пользователя дважды')
-        #    )
-   #     ]
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
-
 
     def get_recipes(self, obj):
         from api.serializers import ShortRecipeSerializer

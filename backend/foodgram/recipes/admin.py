@@ -17,6 +17,7 @@ class RecipeAdmin(ModelAdmin):
     def count_favorites(self, obj):
         return obj.favorites.count()
 
+
 admin.site.register(Tag)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)

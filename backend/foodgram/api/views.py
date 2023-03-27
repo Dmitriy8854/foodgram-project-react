@@ -9,10 +9,8 @@ from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
                                    HTTP_400_BAD_REQUEST)
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-
 from recipes.models import (Favorites, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
-
 from .filters import RecipeFilter
 from .permissions import AuthorOrReadOnly, IsAdmin
 from .serializers import (IngredientSerializer, RecipeSerializer,
@@ -47,14 +45,18 @@ class RecipeViewSet(ModelViewSet):
 
         if user.is_anonymous:
             queryset = Recipe.objects.select_related(
-            'author').prefetch_related('ingredients').annotate(
-            is_favorited=Exists(Favorites.objects.filter(user=None, recipe=OuterRef('pk'))),
-            is_in_shopping_cart=Exists(ShoppingCart.objects.filter(user=None, recipe=OuterRef('pk')))
-        )
+                'author').prefetch_related('ingredients').annotate(
+                    is_favorited=Exists(
+                        Favorites.objects.filter(user=None, recipe=OuterRef('pk'))),
+                    is_in_shopping_cart=Exists(
+                        ShoppingCart.objects.filter(user=None, recipe=OuterRef('pk')))
+                )
             return queryset
 
         favorites = Favorites.objects.filter(user=user, recipe=OuterRef('pk'))
-        shopping_cart = ShoppingCart.objects.filter(user=user, recipe=OuterRef('pk'))
+        shopping_cart = ShoppingCart.objects.filter(
+            user=user, recipe=OuterRef('pk')
+        )
 
         queryset = Recipe.objects.select_related(
             'author').prefetch_related('ingredients').annotate(
@@ -96,7 +98,6 @@ class RecipeViewSet(ModelViewSet):
             detail=True,
             permission_classes=(IsAuthenticated,)
             )
-
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':

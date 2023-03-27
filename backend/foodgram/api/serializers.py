@@ -5,7 +5,6 @@ from django.forms import BooleanField
 from rest_framework.serializers import (BooleanField, CharField, ImageField,
                                         ModelSerializer, ValidationError)
 from rest_framework.status import HTTP_400_BAD_REQUEST
-
 from recipes.models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 from users.serializers import CustomUserSerializer
 
@@ -109,7 +108,7 @@ class RecipeSerializer(ModelSerializer):
 
         ingredients = self.initial_data.get('ingredients')
         RecipeIngredient.objects.filter(recipe=instance).delete()
- 
+
         RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
                 recipe=instance,
@@ -120,41 +119,41 @@ class RecipeSerializer(ModelSerializer):
         instance.save()
         return instance
 
-    def validate(self, data): 
-        ingredients = self.initial_data.get('ingredients') 
-        tags = self.initial_data.get('tags') 
-        if not ingredients: 
-            raise ValidationError( 
-                {'ingredients': ('В рецепте должен быть использован ' 
-                                 'минимум один ингредиент') 
-                 } 
-            ) 
+    def validate(self, data):
+        ingredients = self.initial_data.get('ingredients')
+        tags = self.initial_data.get('tags')
+        if not ingredients:
+            raise ValidationError(
+                {'ingredients': ('В рецепте должен быть использован '
+                                 'минимум один ингредиент')
+                 }
+            )
         array_of_ingredients = []
-        for ingredient in ingredients: 
+        for ingredient in ingredients:
 
-            if ingredient['id'] in array_of_ingredients: 
-                raise ValidationError( 
-                    detail='Ингредиенты не должны дублироваться', 
-                    code=HTTP_400_BAD_REQUEST 
+            if ingredient['id'] in array_of_ingredients:
+                raise ValidationError(
+                    detail='Ингредиенты не должны дублироваться',
+                    code=HTTP_400_BAD_REQUEST
                 )
             array_of_ingredients.append(ingredient['id'])
-            if int(ingredient['amount']) < 1: 
-                raise ValidationError( 
-                    {'ingredients': ('Количество ингредиента в рецепте ' 
-                                     'должно быть больше 0') 
-                     } 
+            if int(ingredient['amount']) < 1:
+                raise ValidationError(
+                    {'ingredients': ('Количество ингредиента в рецепте '
+                                     'должно быть больше 0')
+                     }
                 )
 
-        if not tags: 
-            raise ValidationError( 
-                {'tags': ('Рецепт должен быть привязан ' 
-                          'минимум к одному тегу') 
-                 } 
-            ) 
-        array_of_tags = set(tags) 
-        if len(array_of_tags) != len(tags): 
-            raise ValidationError( 
-                detail='Теги не должны дублироваться в рецепте', 
-                code=HTTP_400_BAD_REQUEST 
-            ) 
+        if not tags:
+            raise ValidationError(
+                {'tags': ('Рецепт должен быть привязан '
+                          'минимум к одному тегу')
+                 }
+            )
+        array_of_tags = set(tags)
+        if len(array_of_tags) != len(tags):
+            raise ValidationError(
+                detail='Теги не должны дублироваться в рецепте',
+                code=HTTP_400_BAD_REQUEST
+            )
         return data
