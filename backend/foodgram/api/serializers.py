@@ -80,7 +80,6 @@ class RecipeSerializer(ModelSerializer):
         for tag in tags:
             RecipeTag.objects.create(tag_id=tag, recipe=recipe)
 
-
         RecipeIngredient.objects.bulk_create(
             RecipeIngredient(
                 recipe=recipe,

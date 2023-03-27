@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -16,7 +16,6 @@ User = get_user_model()
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
-
 
     @action(detail=False, permission_classes=(IsAuthenticated,))
     def subscriptions(self, request):

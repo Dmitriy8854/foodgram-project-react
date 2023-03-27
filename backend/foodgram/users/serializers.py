@@ -28,7 +28,8 @@ class CustomUserSerializer(UserSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'email', 'first_name', 'last_name', 'username', 'is_subscribed'
+            'id', 'email', 'first_name',
+            'last_name', 'username', 'is_subscribed'
         )
         write_only_field = ('password',)
 
