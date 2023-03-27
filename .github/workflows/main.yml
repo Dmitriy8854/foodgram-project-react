@@ -20,7 +20,7 @@ jobs:
         python-version: 3.7
 
     - name: Install dependencies
-      run: | 
+      run: |
         # обновление pip
         python -m pip install --upgrade pip 
         # установка flake8 и его плагинов
