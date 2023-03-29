@@ -1,24 +1,34 @@
-from csv import DictReader
+import csv
+import os
 
-from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
+
 from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
+    help = 'loading ingredients from data in json or csv'
+
+    def add_arguments(self, parser):
+        parser.add_argument('filename', default='ingredients.csv', nargs='?',
+                            type=str)
 
     def handle(self, *args, **options):
-        print("Загрузка данных из ingredients.csv в Ingredient:")
-        model = Ingredient
-        if model.objects.exists():
-            print(
-                f"{model.name} заполнена другими данными, отменена загрузки"
-            )
-        else:
-            for row in DictReader(
-                open("data/ingredients.csv", encoding="utf8")
-            ):
-                model.objects.create(
-                    tittle=row["ingredient"],
-                    measurement=row["measurement"]
-                )
-        print("Загрузка завершена")
+        try:
+            with open(os.path.join(
+                    settings.BASE_DIR,
+                    'data',
+                    options['filename']),
+                    'r',
+                    encoding='utf-8') as f:
+                data = csv.reader(f)
+                for row in data:
+                    name, measurement_unit = row
+                    Ingredient.objects.get_or_create(
+                        name=name,
+                        measurement_unit=measurement_unit
+                    )
+        except FileNotFoundError:
+            raise CommandError('Добавьте файл ingredients в папку data')
+
