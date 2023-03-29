@@ -9,7 +9,7 @@ jobs:
 
     steps:
     # Запуск actions checkout — готового скрипта   
-    # для клонирования репозитория
+    # для клонирования репозитория 
     - uses: actions/checkout@v2
     - name: Set up Python
       # Запуск actions setup-python — готового скрипта  
