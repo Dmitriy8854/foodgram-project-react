@@ -1,7 +1,10 @@
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import (AllValuesMultipleFilter,
-                                           BooleanFilter, FilterSet,
-                                           ModelChoiceFilter)
+from django_filters.rest_framework import FilterSet
+from django_filters.rest_framework.filters import (
+    ModelChoiceFilter,
+    AllValuesMultipleFilter,
+    BooleanFilter
+)
 from recipes.models import Recipe
 
 User = get_user_model()
@@ -20,7 +23,7 @@ class RecipeFilter(FilterSet):
 
     def is_in_shopping_cart_filter(self, queryset, name, value):
         if value and not self.request.user.is_anonymous:
-            return queryset.filter(basket__user=self.request.user)
+            return queryset.filter(baskets__user=self.request.user)
         return queryset
 
     class Meta:
