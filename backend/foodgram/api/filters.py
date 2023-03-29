@@ -1,12 +1,32 @@
 from django.contrib.auth import get_user_model
-from django_filters.rest_framework import FilterSet
+from django.db.models import BooleanField, ExpressionWrapper, Q
+from django_filters.rest_framework import FilterSet, filters
 from django_filters.rest_framework.filters import (AllValuesMultipleFilter,
                                                    BooleanFilter,
                                                    ModelChoiceFilter)
-from recipes.models import Recipe
+from recipes.models import Recipe, Ingredient
 
 User = get_user_model()
 
+
+class IngredientFilter(FilterSet):
+    """Фильтр по названию ингредиента"""
+    name = filters.CharFilter(method='filter_name')
+
+    class Meta:
+        model = Ingredient
+        fields = ('name',)
+
+    def filter_name(self, queryset, name, value):
+
+        return queryset.filter(
+            Q(name__istartswith=value) | Q(name__icontains=value)
+        ).annotate(
+            startswith=ExpressionWrapper(
+                Q(name__istartswith=value),
+                output_field=BooleanField()
+            )
+        ).order_by('-startswith')
 
 class RecipeFilter(FilterSet):
     author = ModelChoiceFilter(queryset=User.objects.all())

@@ -5,7 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import (Favorites, Ingredient, Recipe, RecipeIngredient,
                             ShoppingCart, Tag)
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
+from .filters import IngredientFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (HTTP_201_CREATED, HTTP_204_NO_CONTENT,
@@ -23,9 +23,10 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (IsAdmin,)
     pagination_class = None
-    filter_backends = (SearchFilter,)
+    filter_backends = (DjangoFilterBackend,)
+    #filter_backends = (SearchFilter,)
     search_fields = ('^name',)
-
+    filterset_class = IngredientFilter
 
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
