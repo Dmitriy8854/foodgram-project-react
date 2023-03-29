@@ -28,6 +28,7 @@ class IngredientFilter(FilterSet):
             )
         ).order_by('-startswith')
 
+
 class RecipeFilter(FilterSet):
     author = ModelChoiceFilter(queryset=User.objects.all())
     tags = AllValuesMultipleFilter(field_name='tags__slug')

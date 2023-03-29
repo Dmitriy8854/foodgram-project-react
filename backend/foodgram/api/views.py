@@ -24,9 +24,9 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     permission_classes = (IsAdmin,)
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
-    #filter_backends = (SearchFilter,)
     search_fields = ('^name',)
     filterset_class = IngredientFilter
+
 
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
