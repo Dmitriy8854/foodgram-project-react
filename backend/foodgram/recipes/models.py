@@ -146,7 +146,7 @@ class Favorites(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='Невозможно добавить рецептв избранное два раза'
+                name='Не получится это сделать'
             )
         ]
 
@@ -172,7 +172,7 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='Пользователь не может добавить рецепт в Корзину дважды'
+                name='Нельзя добавить рецепт в Корзину два раза'
             )
         ]
 
