@@ -146,7 +146,7 @@ class Favorites(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=('user', 'recipe'),
-                name='Пользователю нельзя добавить рецепт в избранное дважды'
+                name='Невозможно добавить рецептв избранное два раза'
             )
         ]
 
