@@ -2,10 +2,10 @@ from base64 import b64decode
 
 from django.core.files.base import ContentFile
 from django.forms import BooleanField
+from recipes.models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 from rest_framework.serializers import (BooleanField, CharField, ImageField,
                                         ModelSerializer, ValidationError)
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from recipes.models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 from users.serializers import CustomUserSerializer
 
 

@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import FilterSet
-from django_filters.rest_framework.filters import (
-    ModelChoiceFilter,
-    AllValuesMultipleFilter,
-    BooleanFilter
-)
+from django_filters.rest_framework.filters import (AllValuesMultipleFilter,
+                                                   BooleanFilter,
+                                                   ModelChoiceFilter)
 from recipes.models import Recipe
 
 User = get_user_model()
