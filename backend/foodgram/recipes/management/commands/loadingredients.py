@@ -31,4 +31,3 @@ class Command(BaseCommand):
                     )
         except FileNotFoundError:
             raise CommandError('Добавьте файл ingredients в папку data')
-
