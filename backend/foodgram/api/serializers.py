@@ -135,7 +135,6 @@ class RecipeSerializer(ModelSerializer):
                     detail='Ингредиенты не должны дублироваться',
                     code=HTTP_400_BAD_REQUEST
                 )
-            
             if int(ingredient['amount']) < 1:
                 raise ValidationError(
                     {'ingredients': ('Количество ингредиента в рецепте '
