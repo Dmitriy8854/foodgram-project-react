@@ -118,7 +118,7 @@ class RecipeSerializer(ModelSerializer):
         instance.save()
         return instance
 
-    def validate(self, value):
+    def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
         tags = self.initial_data.get('tags')
         if not ingredients:
@@ -154,4 +154,4 @@ class RecipeSerializer(ModelSerializer):
                 detail='Теги не должны дублироваться в рецепте',
                 code=HTTP_400_BAD_REQUEST
             )
-        return value
+        return data
