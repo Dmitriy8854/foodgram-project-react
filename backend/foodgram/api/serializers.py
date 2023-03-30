@@ -137,7 +137,7 @@ class RecipeSerializer(ModelSerializer):
                 )
             if int(ingredient.get('amount')) < 1:
                 raise ValidationError(
-                    {'ingredients': ('Количество ингредиента в рецепте '
+                    {'amount': ('Количество ингредиента в рецепте '
                                      'должно быть больше 0')},
                     code=HTTP_400_BAD_REQUEST
                 )
@@ -148,6 +148,8 @@ class RecipeSerializer(ModelSerializer):
                           'минимум к одному тегу')
                  }
             )
+        Ingredient.objects.filter(id__in=ingredient_ids)
+        
         array_of_tags = set(tags)
         if len(array_of_tags) != len(tags):
             raise ValidationError(
