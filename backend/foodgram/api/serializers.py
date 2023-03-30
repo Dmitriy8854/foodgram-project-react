@@ -54,8 +54,8 @@ class RecipeSerializer(ModelSerializer):
         source='recipeingredient_set',
     )
     author = CustomUserSerializer(read_only=True)
-    is_favorited = BooleanField(read_only=True)
-    is_in_shopping_cart = BooleanField(read_only=True)
+    is_favorited = BooleanField(read_only=True, default=None)
+    is_in_shopping_cart = BooleanField(read_only=True, default=None)
     image = Base64ImageField()
 
     class Meta:
