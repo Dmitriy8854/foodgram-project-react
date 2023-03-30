@@ -107,7 +107,6 @@ class RecipeViewSet(ModelViewSet):
         if request.method == 'POST':
             serializer = ShortRecipeSerializer(recipe)
             if ShoppingCart.objects.filter(
-         #   if ShoppingCart.objects.get_or_create(
                 user=request.user,
                 recipe=recipe
             ).exists():
