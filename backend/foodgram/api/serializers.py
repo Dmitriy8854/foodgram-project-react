@@ -119,8 +119,6 @@ class RecipeSerializer(ModelSerializer):
         return instance
 
     def validate(self, value):
-
-
         ingredients = self.initial_data.get('ingredients')
         tags = self.initial_data.get('tags')
         if not ingredients:
