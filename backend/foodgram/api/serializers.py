@@ -135,14 +135,14 @@ class RecipeSerializer(ModelSerializer):
                     detail='Ингредиенты не должны дублироваться',
                     code=HTTP_400_BAD_REQUEST
                 )
-            array_of_ingredients.append(ingredient['id'])
+            
             if int(ingredient['amount']) < 1:
                 raise ValidationError(
                     {'ingredients': ('Количество ингредиента в рецепте '
-                                     'должно быть больше 0')
-                     }
+                                     'должно быть больше 0')},
+                    code=HTTP_400_BAD_REQUEST
                 )
-
+            array_of_ingredients.append(ingredient['id'])
         if not tags:
             raise ValidationError(
                 {'tags': ('Рецепт должен быть привязан '
