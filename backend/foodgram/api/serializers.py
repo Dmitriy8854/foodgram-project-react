@@ -148,8 +148,6 @@ class RecipeSerializer(ModelSerializer):
                           'минимум к одному тегу')
                  }
             )
-        Ingredient.objects.filter(id__in=ingredient_ids)
-        
         array_of_tags = set(tags)
         if len(array_of_tags) != len(tags):
             raise ValidationError(
