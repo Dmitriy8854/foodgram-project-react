@@ -44,24 +44,10 @@ class RecipeViewSet(ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-
-     #   if user.is_anonymous:
-      #      queryset = Recipe.objects.select_related(
-    #            'author').prefetch_related('ingredients').annotate(
-    #                is_favorited=Exists(
-     #                   Favorites.objects.filter(
-     #                       user=None, recipe=OuterRef('pk'))),
-     #               is_in_shopping_cart=Exists(
-     #                   ShoppingCart.objects.filter(
-       #                     user=None, recipe=OuterRef('pk')))
-    #        ) 
-      #      return queryset
-
         favorites = Favorites.objects.filter(user=user, recipe=OuterRef('pk'))
         shopping_cart = ShoppingCart.objects.filter(
             user=user, recipe=OuterRef('pk')
         )
-
         queryset = Recipe.objects.select_related(
             'author').prefetch_related('ingredients').annotate(
             is_favorited=Exists(favorites),
