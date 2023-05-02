@@ -8,6 +8,7 @@ from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
+    """Класс команды загрузки базы данных."""
     help = 'loading ingredients from data in json or csv'
 
     def add_arguments(self, parser):
