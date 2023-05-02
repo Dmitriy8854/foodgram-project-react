@@ -36,7 +36,7 @@ class TagViewSet(ReadOnlyModelViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
-    """Вьюсет для работы с моделью рецепты."""
+    """Вьюсет для работы с моделью рецептов."""
     serializer_class = RecipeSerializer
     permission_classes = (AuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)

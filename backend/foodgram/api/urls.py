@@ -5,6 +5,7 @@ from .views import IngredientViewSet, RecipeViewSet, TagViewSet
 
 router = routers.SimpleRouter()
 
+# Роуты для рецептов, тегов и ингредиентов
 router.register('recipes', RecipeViewSet, basename='recipes')
 router.register('tags', TagViewSet)
 router.register('ingredients', IngredientViewSet)
