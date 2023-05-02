@@ -156,6 +156,7 @@ class Favorites(models.Model):
 
 
 class ShoppingCart(models.Model):
+    """Модель покупок."""
     user = models.ForeignKey(
         User, on_delete=models.CASCADE,
         related_name='baskets',
