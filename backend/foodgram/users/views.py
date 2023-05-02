@@ -14,6 +14,7 @@ User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
+    """Представление user"""
     queryset = User.objects.all()
     serializer_class = CustomUserSerializer
 

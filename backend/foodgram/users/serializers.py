@@ -10,6 +10,7 @@ from .models import Subscriptions
 
 
 class RegistreUserSerializer(UserCreateSerializer):
+    """Сериализатор для регистрации user"""
     class Meta:
         model = User
         fields = (
