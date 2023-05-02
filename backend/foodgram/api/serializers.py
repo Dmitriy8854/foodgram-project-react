@@ -36,6 +36,7 @@ class IngredientRecipeSerializer(ModelSerializer):
         model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
+
 """Class Base64Image."""
 class Base64ImageField(ImageField):
     def to_internal_value(self, data):
